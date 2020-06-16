@@ -7,4 +7,4 @@ This is the Backend repository of the application
 C#, ASP.NET Core 3.1, Entity Framework Core, SignalR
 
 ## Live Version
-This site is currently running under [this url](https://www.asky.com). Its API is also running under [this url](https://api.asky.com). And, you can visit the frontend repository from [here](https://github.com/Himato/Asky_Frontend)
+This site is currently running under [this url](https://asky.mesawer.com). Its API is also running under [this url](https://api.asky.mesawer.com). And, you can visit the frontend repository from [here](https://github.com/Himato/Asky_Frontend)
