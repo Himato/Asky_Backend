@@ -65,9 +65,10 @@ namespace Asky.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> ForgetPassword([FromBody] ForgetPasswordDto forgetPasswordDto)
         {
-            return await Do(async () =>
+            return await Do(() =>
             {
-                await _userService.ForgetPassword(forgetPasswordDto.Email);
+                //await _userService.ForgetPassword(forgetPasswordDto.Email);
+                throw new ArgumentException("This feature is currently unsupported due to insecure domain");
             });
         }
 

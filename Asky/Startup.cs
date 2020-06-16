@@ -45,7 +45,7 @@ namespace Asky
             }
             else
             {
-                app.UseHsts();
+                //app.UseHsts();
             }
 
             app.UseStaticFiles();
@@ -60,7 +60,7 @@ namespace Asky
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Asky V1");
             });
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             app.UseResponseCaching();
             app.UseRouting();
             app.UseCors("CorsPolicy");
