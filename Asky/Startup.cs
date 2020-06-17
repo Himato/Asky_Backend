@@ -23,7 +23,7 @@ namespace Asky
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddServices();
-            services.AddCors();
+            services.AddCors(Configuration);
             services.AddSignalR();
             services.ConfigureEntityFramework(Configuration);
             services.ConfigureIdentity();
