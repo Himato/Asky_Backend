@@ -179,13 +179,13 @@ namespace Asky
                 });
         }
 
-        public static void AddCors(this IServiceCollection services)
+        public static void AddCors(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddCors(options => options.AddPolicy("CorsPolicy",
                 builder =>
                 {
                     builder.AllowAnyMethod().AllowAnyHeader()
-                        .WithOrigins("http://asky.mesawer.com")
+                        .WithOrigins(configuration["Origins:Frontend"])
                         .AllowCredentials();
                 }));
         }
