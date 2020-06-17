@@ -58,7 +58,7 @@ namespace Asky.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> AddTopic(TopicDto topicDto)
         {
-            return await Do(async () => await _topicService.AddTopic(User.Identity.GetUserId(), topicDto));
+            return await Create(nameof(AddTopic), async () => await _topicService.AddTopic(User.Identity.GetUserId(), topicDto));
         }
 
         [HttpPut]
@@ -126,7 +126,7 @@ namespace Asky.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> AddComments(int topicId, CommentDto commentDto)
         {
-            return await Do(async () => await _commentService.AddComment(User.Identity.GetUserId(), topicId, commentDto));
+            return await Create(nameof(AddComments), async () => await _commentService.AddComment(User.Identity.GetUserId(), topicId, commentDto));
         }
 
         [HttpPut]
@@ -183,7 +183,7 @@ namespace Asky.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> AddReply(int commentId, ReplyDto replyDto)
         {
-            return await Do(async () => await _commentService.AddReply(User.Identity.GetUserId(), commentId, replyDto));
+            return await Create(nameof(AddReply), async () => await _commentService.AddReply(User.Identity.GetUserId(), commentId, replyDto));
         }
 
         [HttpPut]

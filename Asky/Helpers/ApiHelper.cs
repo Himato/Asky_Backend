@@ -117,7 +117,12 @@ namespace Asky.Helpers
             {
                 var result = await func();
 
-                return Created(uri, new { Value = result });
+                if (result is string || result.GetType().IsValueType)
+                {
+                    return Ok(new { Value = result });
+                }
+
+                return Created(uri, result);
             }
             catch (AuthenticationException)
             {
