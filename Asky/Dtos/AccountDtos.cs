@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Asky.Models;
@@ -184,6 +185,10 @@ namespace Asky.Dtos
 
         public string Username { get; set; }
 
+        public string Email { get; set; }
+
+        public DateTime CreatedAt { get; set; }
+
         public string ImageUri { get; set; }
 
         public int NumberOfTopics { get; set; }
@@ -198,6 +203,8 @@ namespace Asky.Dtos
             {
                 Name = user.GetName(),
                 Username = user.UserName,
+                Email = user.Email,
+                CreatedAt = user.CreatedAt,
                 ImageUri = user.GetImage(),
                 NumberOfTopics = user.Topics.Count,
                 NumberOfUpVotes = user.Votes.Count(v => v.IsUp),
