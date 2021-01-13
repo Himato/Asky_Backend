@@ -15,7 +15,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -31,15 +30,16 @@ namespace Asky
                 return str.ExcludeNonAlpha();
             }
 
-        	var date = (long) (DateTime.UtcNow - new DateTime(2020, 1, 1)).TotalSeconds;
-            var key = $"{date:X}".ToLower();
+            var date = (long) (DateTime.UtcNow - new DateTime(2020, 1, 1)).TotalSeconds;
+            var key  = $"{date:X}".ToLower();
 
             return $"{str.ExcludeNonAlpha()}-{key}";
         }
 
         private static string ExcludeNonAlpha(this string str)
         {
-            return str.ToLower().Replace(' ', '-').Where(c => c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9' || c == '-')
+            return str.ToLower().Replace(' ', '-').Where(c =>
+                    c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9' || c == '-')
                 .Aggregate("", (current, next) => current + next);
         }
 
@@ -56,21 +56,23 @@ namespace Asky
 
     public static class DbUpdateExceptionHandler
     {
-        public static string GetExceptionMessage(this DbUpdateException exception)
-        {
-            return exception.InnerException?.Message ?? exception.Message;
-        }
+        public static string GetExceptionMessage(this DbUpdateException exception) => exception.InnerException?.Message ?? exception.Message;
     }
 
     public static class IdentityExtenstion
     {
         public static string GetUserId(this IIdentity identity)
         {
-            return ((ClaimsIdentity)identity).Claims.First(c => c.Type.Equals(nameof(ClaimTypes.NameIdentifier).ToCamelCase())).Value;
+            return ((ClaimsIdentity) identity)
+                .Claims.First(c => c.Type.Equals(nameof(ClaimTypes.NameIdentifier).ToCamelCase()))
+                .Value;
         }
+
         public static string GetUsername(this IIdentity identity)
         {
-            return ((ClaimsIdentity)identity).Claims.First(c => c.Type.Equals(nameof(ClaimTypes.Name).ToCamelCase())).Value;
+            return ((ClaimsIdentity) identity)
+                .Claims.First(c => c.Type.Equals(nameof(ClaimTypes.Name).ToCamelCase()))
+                .Value;
         }
     }
 
@@ -91,7 +93,7 @@ namespace Asky
             services.AddMvc()
                 .AddNewtonsoftJson(options =>
                 {
-                    options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                    options.SerializerSettings.ContractResolver      = new CamelCasePropertyNamesContractResolver();
                     options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
                 })
                 .SetCompatibilityVersion(version);
@@ -110,7 +112,8 @@ namespace Asky
 
         public static void ConfigureEntityFramework(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("LocalDb")));
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(configuration.GetConnectionString("LocalDb")));
         }
 
         public static void ConfigureIdentity(this IServiceCollection services)
@@ -123,17 +126,18 @@ namespace Asky
             {
                 options.User.RequireUniqueEmail = true;
                 // Default Password settings.
-                options.Password.RequireDigit = false;
-                options.Password.RequireLowercase = false;
+                options.Password.RequireDigit           = false;
+                options.Password.RequireLowercase       = false;
                 options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireUppercase = false;
-                options.Password.RequiredLength = 8;
-                options.Password.RequiredUniqueChars = 0;
+                options.Password.RequireUppercase       = false;
+                options.Password.RequiredLength         = 8;
+                options.Password.RequiredUniqueChars    = 0;
             });
 
             services.AddAuthorization(options =>
             {
-                options.AddPolicy(nameof(UserRole.Admin), policy => policy.RequireClaim(nameof(ClaimTypes.Role), UserRole.Admin));
+                options.AddPolicy(nameof(UserRole.Admin),
+                    policy => policy.RequireClaim(nameof(ClaimTypes.Role), UserRole.Admin));
             });
         }
 
@@ -144,13 +148,13 @@ namespace Asky
                 .AddAuthentication(options =>
                 {
                     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultScheme             = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme    = JwtBearerDefaults.AuthenticationScheme;
                 })
                 .AddJwtBearer(cfg =>
                 {
                     cfg.RequireHttpsMetadata = false;
-                    cfg.SaveToken = true;
+                    cfg.SaveToken            = true;
                     cfg.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuerSigningKey = true,
@@ -168,12 +172,13 @@ namespace Asky
                             var accessToken = context.Request.Query["access_token"];
 
                             var path = context.HttpContext.Request.Path;
-                            if (!string.IsNullOrEmpty(accessToken) && 
+                            if (!string.IsNullOrEmpty(accessToken) &&
                                 (path.StartsWithSegments("/topicsHub") || path.StartsWithSegments("/notificationsHub")))
                             {
                                 // Read the token out of the query string
                                 context.Token = accessToken;
                             }
+
                             return Task.CompletedTask;
                         }
                     };
@@ -185,11 +190,17 @@ namespace Asky
             services.AddCors(options => options.AddPolicy("CorsPolicy",
                 builder =>
                 {
-                    builder.AllowAnyMethod().AllowAnyHeader()
-                        .WithOrigins(configuration["Origins:Frontend"])
-                        .AllowCredentials();
+                    var origins = configuration.GetSection("Origins").AsEnumerable();
+
+                    foreach (var (_, value) in origins)
+                    {
+                        if (string.IsNullOrEmpty(value)) continue;
+
+                        builder.AllowAnyMethod().AllowAnyHeader()
+                            .WithOrigins(value)
+                            .AllowCredentials();
+                    }
                 }));
         }
     }
-
 }
